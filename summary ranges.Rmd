@@ -1,0 +1,190 @@
+---
+title: "Dragon Den Descriptive Analysis"
+author: "Pratik Mahajan"
+date: "2024-04-22"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r,include=FALSE}
+
+library(ggplot2)
+
+hud <- read.csv('hud_cleaned.csv')
+
+```
+
+
+```{r,include=FALSE}
+
+library(dplyr)
+library(knitr)
+library(tidyr)
+
+```
+
+
+```{r,include=FALSE}
+
+hud$ratio_average_months_on_waiting_list <- hud$average_months_on_waiting_list / hud$total_wait
+
+
+quantiles_ratio_average_months_on_waiting_list <- quantile(hud$ratio_average_months_on_waiting_list, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+
+data_ratio_average_months_on_waiting_list <- data.frame(
+  Quantile = c("0%", "20%", "40%", "60%", "80%", "100%"),
+  Value = quantiles_ratio_average_months_on_waiting_list)
+
+
+```
+
+
+```{r}
+
+kable(data_ratio_average_months_on_waiting_list, format = "pipe", caption = "Quantiles for Ratio of Average Months on Waiting List to Total Wait")
+```
+
+
+```{r,include=FALSE}
+
+hud$ratio_average_months_since_moved <- hud$average_months_since_moved / hud$total_wait
+
+
+quantiles_ratio_average_months_since_moved <- quantile(hud$ratio_average_months_since_moved, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+
+data_ratio_average_months_since_moved <- data.frame(
+  Quantile = c("0%", "20%", "40%", "60%", "80%", "100%"),
+  Value = quantiles_ratio_average_months_since_moved)
+
+
+```
+
+
+```{r}
+
+kable(data_ratio_average_months_since_moved, format = "pipe", caption = "Quantiles for Average Months Since Moved In to Total Wait")
+
+```
+
+
+
+
+```{r,include=FALSE}
+
+hud$ratio_percent_62_or_more_head_or_spouse <- hud$percent_62_or_more_head_or_spouse / hud$total_wait
+
+
+quantiles_ratio_percent_62_or_more_head_or_spouse <- quantile(hud$ratio_percent_62_or_more_head_or_spouse, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+
+data_ratio_percent_62_or_more_head_or_spouse <- data.frame(
+  Quantile = c("0%", "20%", "40%", "60%", "80%", "100%"),
+  Value = quantiles_ratio_percent_62_or_more_head_or_spouse)
+```
+
+
+```{r}
+
+kable(data_ratio_percent_62_or_more_head_or_spouse, format = "pipe", caption = "Quantiles for Ratio of percent_62_or_more_head_or_spouse to Total Wait")
+
+```
+
+
+```{r, include=FALSE}
+
+hud$ratio_percent_85_or_more_head_or_spouse <- hud$percent_85_or_more_head_or_spouse / hud$total_wait
+
+
+quantiles_ratio_percent_85_or_more_head_or_spouse <- quantile(hud$ratio_percent_85_or_more_head_or_spouse, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+
+data_ratio_percent_85_or_more_head_or_spouse <- data.frame(
+  Quantile = c("0%", "20%", "40%", "60%", "80%", "100%"),
+  Value = quantiles_ratio_percent_85_or_more_head_or_spouse)
+```
+
+
+```{r}
+
+kable(data_ratio_percent_85_or_more_head_or_spouse, format = "pipe", caption = "Quantiles for Ratio of Percent 85 or More Head or Spouse to Total Wait")
+```
+
+```{r, include=FALSE}
+
+hud$ratio_percent_minority <- hud$percent_minority / hud$total_wait
+
+
+quantiles_ratio_percent_minority <- quantile(hud$ratio_percent_minority, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+
+data_ratio_percent_minority <- data.frame(
+  Quantile = c("0%", "20%", "40%", "60%", "80%", "100%"),
+  Value = quantiles_ratio_percent_minority)
+```
+
+
+```{r}
+
+kable(data_ratio_percent_minority, format = "pipe", caption = "Quantiles for Ratio of Percent Minority to Total Wait")
+
+```
+
+```{r, include=FALSE}
+
+hud$ratio_percent_occupied <- hud$percent_occupied / hud$total_wait
+
+
+quantiles_ratio_percent_occupied <- quantile(hud$ratio_percent_occupied, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+
+data_ratio_percent_occupied <- data.frame(
+  Quantile = c("0%", "20%", "40%", "60%", "80%", "100%"),
+  Value = quantiles_ratio_percent_occupied)
+```
+
+
+```{r}
+
+kable(data_ratio_percent_occupied, format = "pipe", caption = "Quantiles for Ratio of percent_occupied to Total Wait")
+
+
+```
+
+
+```{r,include=FALSE}
+# Calculate quantiles for 'total_wait'
+quantiles_total_wait <- quantile(hud$total_wait, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+data_total_wait <- data.frame(
+  Quantile = c("0%", "20%", "40%", "60%", "80%", "100%"),
+  Value = quantiles_total_wait)
+```
+
+
+```{r}
+
+kable(data_total_wait, format = "pipe", caption = "Quantiles for Total Wait")
+```
+
+
+# Scatterplots 
+
+```{r, warning=FALSE}
+plot_list <- names(hud)[!(names(hud) %in% c("total_wait", "state", "county"))]
+
+
+for (var in plot_list) {
+  p <- ggplot(hud, aes_string(x = var, y = "total_wait")) + 
+    geom_point(alpha = 0.5) + 
+    geom_smooth(method = "lm", color = "blue", se = FALSE) +  
+    labs(title = paste("Scatterplot of", var, "vs Total Wait"), x = var, y = "Total Wait") +
+    theme_minimal() 
+  
+  print(p) 
+}
+```
+
